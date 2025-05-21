@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET BUDDY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Стиль для PET BUDDY - неоновый эффект с тонкими буквами и жирной обводкой */
+        .text-neon {
+            font-size: 3rem; /* размер текста */
+            font-weight: 100; /* тонкий шрифт */
+            color: white; /* внутренний цвет белый */
+            position: relative;
+            text-transform: uppercase; /* заглавные буквы */
+        }
+        .text-neon::before {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            color: transparent;
+            -webkit-text-stroke: 8px #1e3a8a; /* ещё более жирная тёмно-синяя обводка */
+            text-stroke: 8px #1e3a8a;
+            z-index: -1;
+            filter: drop-shadow(0 0 5px #1e3a8a); /* неоновое свечение */
+        }
+        
+        /* Яркий синий текст с фоном e7f3ff */
+        .text-subtitle {
+            color: #3b82f6; /* яркий синий цвет */
+            font-weight: 600;
+            background-color: #e7f3ff; /* точный цвет заднего фона */
+            border-radius: 0.375rem; /* скругленные углы */
+            padding: 0.5rem 1rem; /* отступ для лучшей видимости фона */
+        }
+
+        /* Стиль для выделенной кнопки */
+        .selected {
+            border-bottom: 3px solid #1e3a8a; /* темно-синяя нижняя граница */
+        }
+    </style>
+</head>
+<body class="bg-white flex flex-col items-center min-h-screen p-6">
+
+    <!-- Заголовок с эффектом неона -->
+    <h1 class="text-neon mb-2" data-text="PET BUDDY">PET BUDDY</h1>
+
+    <!-- Подзаголовок с ярким синим цветом и фоном -->
+    <h2 class="text-subtitle text-xl mb-6">
+        Твой персональный помощник в заботе о питомце!
+    </h2>
+
+    <!-- Изображение 0.png для обоих видов животных -->
+    <img src="0.png" alt="Два вида животных" class="mb-6 max-w-xs">
+
+    <!-- Кнопки для выбора кошки/собаки -->
+    <div class="flex space-x-4 mb-6">
+        <button id="catBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded">Кошка</button>
+        <button id="dogBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded">Собака</button>
+    </div>
+    
+    <!-- Изначально скрытый блок для отображения загруженного фото -->
+    <div id="animalImageBlock" class="hidden mb-6"></div>
+
+    <!-- Инструкции с ярким синим цветом и фоном -->
+    <p class="text-subtitle text-center mb-4 max-w-md">
+        Загрузи фото своего питомца и получи персональные рекомендации по уходу и питанию любимца!
+    </p>
+
+    <!-- Скрытое поле для загрузки файла -->
+    <input type="file" id="uploadInput" accept="image/*" class="hidden" />
+    
+    <!-- Кнопка загрузки фото -->
+    <button id="uploadBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded mb-4">
+        ЗАГРУЗИТЬ ФОТО
+    </button>
+
+    <!-- Блок рекомендаций -->
+    <div id="recommendations" class="hidden max-w-md bg-blue-50 border border-blue-200 rounded p-4 text-blue-900">
+        <!-- Динамический контент будет вставлен здесь -->
+    </div>
+
+    <script>
+        const catBtn = document.getElementById('catBtn');
+        const dogBtn = document.getElementById('dogBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadInput = document.getElementById('uploadInput');
+        const recommendations = document.getElementById('recommendations');
+        const animalImageBlock = document.getElementById('animalImageBlock');
+
+        let selectedAnimal = null; // 'cat' или 'dog'
+
+        // Предустановленные рекомендации для кошек и собак
+        const catRecommendations = [
+            `Порода: Сиамская кошка. Характер: игривая, общительная, любит внимание. Корм: предпочитает влажный корм с высоким содержанием белка.`,
+            `Порода: Мейн-кун. Характер: дружелюбный, ласковый, любит играть. Корм: любит сухой корм с добавками для шерсти.`
+        ];
+
+        const dogRecommendations = [
+            `Порода: Лабрадор ретривер. Характер: активный, дружелюбный, легко обучаемый. Корм: предпочитает сбалансированный сухой корм.`,
+            `Порода: Немецкая овчарка. Характер: умная, защитная, преданная. Корм: любит корм с высоким содержанием мяса.`
+        ];
+
+        // Функция для обновления выделения кнопок
+        function updateSelectedButton() {
+            if (selectedAnimal === 'cat') {
+                catBtn.classList.add('selected');
+                dogBtn.classList.remove('selected');
+            } else if (selectedAnimal === 'dog') {
+                dogBtn.classList.add('selected');
+                catBtn.classList.remove('selected');
+            } else {
+                catBtn.classList.remove('selected');
+                dogBtn.classList.remove('selected');
+            }
+        }
+
+        // Обработчики кликов по кнопкам выбора животного
+        catBtn.addEventListener('click', () => {
+            selectedAnimal = 'cat';
+            updateSelectedButton();
+            animalImageBlock.innerHTML = '';
+            animalImageBlock.classList.add('hidden');
+            recommendations.classList.add('hidden');
+        });
+
+        dogBtn.addEventListener('click', () => {
+            selectedAnimal = 'dog';
+            updateSelectedButton();
+            animalImageBlock.innerHTML = '';
+            animalImageBlock.classList.add('hidden');
+            recommendations.classList.add('hidden');
+        });
+
+        // При клике на кнопку загрузки фото открываем диалог выбора файла
+        uploadBtn.addEventListener('click', () => {
+            if (!selectedAnimal) {
+                alert('Пожалуйста, выберите сначала кошку или собаку.');
+                return;
+            }
+            uploadInput.click();
+        });
+
+        // Обработка выбора файла
+        uploadInput.addEventListener('change', () => {
+            const file = uploadInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                animalImageBlock.innerHTML = `<img src="${e.target.result}" alt="Загруженное фото питомца" class="mb-4 max-w-xs mx-auto rounded" />`;
+                animalImageBlock.classList.remove('hidden');
+
+                // Показать случайную рекомендацию
+                let recs = selectedAnimal === 'cat' ? catRecommendations : dogRecommendations;
+                let randomIndex = Math.floor(Math.random() * recs.length);
+                recommendations.textContent = recs[randomIndex];
+                recommendations.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
+
+</body>
+</html>
