@@ -22,7 +22,7 @@
             right: 0;
             bottom: 0;
             color: transparent;
-            -webkit-text-stroke: 8px #1e3a8a; /* ещё более жирная тёмно-синяя обводка */
+            -webkit-text-stroke: 8px #1e3a8a; /* очень жирная тёмно-синяя обводка */
             text-stroke: 8px #1e3a8a;
             z-index: -1;
             filter: drop-shadow(0 0 5px #1e3a8a); /* неоновое свечение */
@@ -41,6 +41,124 @@
         .selected {
             border-bottom: 3px solid #1e3a8a; /* темно-синяя нижняя граница */
         }
+
+        /* Стиль для блока породы с синим фоном и белым текстом */
+        .breed-detected {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Стиль для блоков с названиями кормов */
+        .food-label {
+            background-color: #d6f7ff;
+            color: #51a6d5;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.5rem 0;
+        }
+
+        /* Стиль для изображений кормов */
+        .food-image {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+        }
+
+        /* Стиль для строки с кормом (контейнер для лейбла и картинки) */
+        .food-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        /* Стиль для кнопок меню и рекомендаций */
+        .menu-button {
+            background-color: #d6f7ff;
+            color: #51a6d5;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: bold;
+            margin: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        /* Эффект при наведении на кнопки меню */
+        .menu-button:hover {
+            background-color: #b8e7ff;
+            color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Эффект при нажатии на кнопки меню */
+        .menu-button:active {
+            background-color: #a5d8f2;
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Стиль для кнопок в нижней части (меньшей высоты) */
+        .small-button {
+            padding: 0.4rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Стили для основных кнопок */
+        .primary-button {
+            background-color: #3b82f6;
+            color: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .primary-button:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .primary-button:active {
+            background-color: #1d4ed8;
+            transform: translateY(1px);
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Стили для поля поиска и кнопки поиска */
+        .search-input {
+            transition: all 0.2s ease;
+            border: 1px solid #93c5fd;
+        }
+        
+        .search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        
+        .search-button {
+            background-color: #3b82f6;
+            color: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .search-button:hover {
+            background-color: #2563eb;
+        }
+        
+        .search-button:active {
+            background-color: #1d4ed8;
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body class="bg-white flex flex-col items-center min-h-screen p-6">
@@ -58,8 +176,8 @@
 
     <!-- Кнопки для выбора кошки/собаки -->
     <div class="flex space-x-4 mb-6">
-        <button id="catBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded">Кошка</button>
-        <button id="dogBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded">Собака</button>
+        <button id="catBtn" class="primary-button font-semibold py-2 px-6 rounded">Кошка</button>
+        <button id="dogBtn" class="primary-button font-semibold py-2 px-6 rounded">Собака</button>
     </div>
     
     <!-- Изначально скрытый блок для отображения загруженного фото -->
@@ -74,35 +192,135 @@
     <input type="file" id="uploadInput" accept="image/*" class="hidden" />
     
     <!-- Кнопка загрузки фото -->
-    <button id="uploadBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded mb-4">
+    <button id="uploadBtn" class="primary-button font-semibold py-2 px-6 rounded mb-4">
         ЗАГРУЗИТЬ ФОТО
     </button>
 
-    <!-- Блок рекомендаций -->
-    <div id="recommendations" class="hidden max-w-md bg-blue-50 border border-blue-200 rounded p-4 text-blue-900">
-        <!-- Динамический контент будет вставлен здесь -->
+    <!-- Блок рекомендаций для кошки - изначально скрыт -->
+    <div id="catRecommendations" class="hidden flex flex-col items-center max-w-lg w-full">
+        <div class="breed-detected w-full">МЕЙН-КУН ОБНАРУЖЕН!</div>
+        
+        <h3 class="text-blue-600 font-bold text-xl mb-2">Ваш питомец - королевская особа кошачьего мира!</h3>
+        
+        <p class="text-gray-700 mb-4 text-center">
+            Роскошная шерсть с водоотталкивающим эффектом, характерные кисточки на ушах и пушистый «енотовый» хвост делают мейн-кунов настоящими аристократами среди кошек. При этом они сохраняют игривость и любознательность на протяжении всей жизни!
+        </p>
+        
+        <h4 class="text-blue-600 font-semibold mb-4">Для поддержания великолепной шерсти вашего мейн-куна рекомендуем:</h4>
+        
+        <!-- Рекомендации по кормам - новая структура -->
+        <div class="food-row">
+            <div class="food-label">SHEBA «ЛОМТИКИ В СОУСЕ С ЛОСОСЕМ»</div>
+            <img src="4.webp" alt="Корм SHEBA" class="food-image">
+        </div>
+        
+        <div class="food-row">
+            <img src="5.webp" alt="Корм PERFECT FIT" class="food-image">
+            <div class="food-label">PERFECT FIT «ДЛЯ КОШЕК КРУПНЫХ ПОРОД»</div>
+        </div>
+        
+        <p class="text-gray-700 mb-4 text-center">
+            Подарите своему домашнему льву питание, достойное его королевского статуса!
+        </p>
+        
+        <!-- Кнопки меню -->
+        <div class="flex flex-wrap justify-center mb-4">
+            <button class="menu-button">МЕНЮ SHEBA</button>
+            <button class="menu-button">МЕНЮ PERFECT FIT</button>
+        </div>
+        
+        <!-- Изображение кошки -->
+        <img src="6.png" alt="Мейн-кун" class="mb-4 max-w-xs">
+        
+        <!-- Кнопки рекомендаций с уменьшенной высотой -->
+        <div class="flex flex-wrap justify-center mb-4">
+            <button class="menu-button small-button">РЕКОМЕНДАЦИИ ПО УХОДУ</button>
+            <button class="menu-button small-button">СОВЕТЫ ЭКСПЕРТОВ</button>
+            <button class="menu-button small-button">ПОДБОР РАЦИОНА</button>
+        </div>
+        
+        <p class="text-gray-700 mb-4 text-center">
+            Каждый раздел разработан с учётом особенностей породы и потребностей именно вашего питомца!
+        </p>
+        
+        <p class="text-blue-600 font-semibold mb-2">Вы также можете задать ваш вопрос!</p>
+        
+        <!-- Форма ввода вопроса -->
+        <div class="flex w-full max-w-md mb-6">
+            <input type="text" placeholder="Введите ваш вопрос..." class="search-input flex-grow px-4 py-2 border rounded-l focus:outline-none">
+            <button class="search-button px-4 py-2 rounded-r">Найти</button>
+        </div>
     </div>
+
+    <!-- Блок рекомендаций для собаки - изначально скрыт -->
+    <div id="dogRecommendations" class="hidden flex flex-col items-center max-w-lg w-full">
+        <div class="breed-detected w-full">ВЕСТ-ХАЙЛЕНД-УАЙТ-ТЕРЬЕР ОБНАРУЖЕН!</div>
+        
+        <h3 class="text-blue-600 font-bold text-xl mb-2">Ваш питомец - маленький шотландский аристократ!</h3>
+        
+        <p class="text-gray-700 mb-4 text-center">
+            Эти белоснежные красавцы известны своим независимым характером и невероятной харизмой. Несмотря на компактный размер, в этом терьере живет дух настоящего шотландского воина - смелый, решительный и всегда готовый к приключениям!
+        </p>
+        
+        <h4 class="text-blue-600 font-semibold mb-4">Для поддержания белоснежной шерсти и бодрого духа вашего аристократа рекомендуем:</h4>
+        
+        <!-- Рекомендации по кормам - новая структура -->
+        <div class="food-row">
+            <div class="food-label">CESAR "РАГУ ИЗ ЯГНЕНКА С ОВОЩАМИ"</div>
+            <img src="7.png" alt="Корм CESAR" class="food-image">
+        </div>
+        
+        <div class="food-row">
+            <img src="8.webp" alt="Корм PERFECT FIT" class="food-image">
+            <div class="food-label">PERFECT FIT "ДЛЯ МАЛЕНЬКИХ ПОРОД С КУРИЦЕЙ"</div>
+        </div>
+        
+        <p class="text-gray-700 mb-4 text-center">
+            Выберите для своего шотландского друга качественное питание, достойное его королевского происхождения!
+        </p>
+        
+        <!-- Кнопки меню -->
+        <div class="flex flex-wrap justify-center mb-4">
+            <button class="menu-button">МЕНЮ CESAR</button>
+            <button class="menu-button">МЕНЮ PERFECT FIT</button>
+        </div>
+        
+        <!-- Изображение собаки -->
+        <img src="9.webp" alt="Вест-хайленд-уайт-терьер" class="mb-4 max-w-xs">
+        
+        <!-- Кнопки рекомендаций с уменьшенной высотой -->
+        <div class="flex flex-wrap justify-center mb-4">
+            <button class="menu-button small-button">РЕКОМЕНДАЦИИ ПО УХОДУ</button>
+            <button class="menu-button small-button">СОВЕТЫ ЭКСПЕРТОВ</button>
+            <button class="menu-button small-button">ПОДБОР РАЦИОНА</button>
+        </div>
+        
+        <p class="text-gray-700 mb-4 text-center">
+            Каждый раздел разработан с учётом особенностей породы и потребностей именно вашего питомца!
+        </p>
+        
+        <p class="text-blue-600 font-semibold mb-2">Вы также можете задать ваш вопрос!</p>
+        
+        <!-- Форма ввода вопроса -->
+        <div class="flex w-full max-w-md mb-6">
+            <input type="text" placeholder="Введите ваш вопрос..." class="search-input flex-grow px-4 py-2 border rounded-l focus:outline-none">
+            <button class="search-button px-4 py-2 rounded-r">Найти</button>
+        </div>
+    </div>
+
+    <!-- Второй заголовок с эффектом неона (внизу страницы) -->
+    <h1 class="text-neon mb-2 mt-4" data-text="PET BUDDY">PET BUDDY</h1>
 
     <script>
         const catBtn = document.getElementById('catBtn');
         const dogBtn = document.getElementById('dogBtn');
         const uploadBtn = document.getElementById('uploadBtn');
         const uploadInput = document.getElementById('uploadInput');
-        const recommendations = document.getElementById('recommendations');
         const animalImageBlock = document.getElementById('animalImageBlock');
+        const catRecommendations = document.getElementById('catRecommendations');
+        const dogRecommendations = document.getElementById('dogRecommendations');
 
         let selectedAnimal = null; // 'cat' или 'dog'
-
-        // Предустановленные рекомендации для кошек и собак
-        const catRecommendations = [
-            `Порода: Сиамская кошка. Характер: игривая, общительная, любит внимание. Корм: предпочитает влажный корм с высоким содержанием белка.`,
-            `Порода: Мейн-кун. Характер: дружелюбный, ласковый, любит играть. Корм: любит сухой корм с добавками для шерсти.`
-        ];
-
-        const dogRecommendations = [
-            `Порода: Лабрадор ретривер. Характер: активный, дружелюбный, легко обучаемый. Корм: предпочитает сбалансированный сухой корм.`,
-            `Порода: Немецкая овчарка. Характер: умная, защитная, преданная. Корм: любит корм с высоким содержанием мяса.`
-        ];
 
         // Функция для обновления выделения кнопок
         function updateSelectedButton() {
@@ -124,7 +342,8 @@
             updateSelectedButton();
             animalImageBlock.innerHTML = '';
             animalImageBlock.classList.add('hidden');
-            recommendations.classList.add('hidden');
+            catRecommendations.classList.add('hidden');
+            dogRecommendations.classList.add('hidden');
         });
 
         dogBtn.addEventListener('click', () => {
@@ -132,7 +351,8 @@
             updateSelectedButton();
             animalImageBlock.innerHTML = '';
             animalImageBlock.classList.add('hidden');
-            recommendations.classList.add('hidden');
+            catRecommendations.classList.add('hidden');
+            dogRecommendations.classList.add('hidden');
         });
 
         // При клике на кнопку загрузки фото открываем диалог выбора файла
@@ -144,23 +364,26 @@
             uploadInput.click();
         });
 
-        // Обработка выбора файла
+        // Обработка выбора файла - измененная часть кода
         uploadInput.addEventListener('change', () => {
             const file = uploadInput.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                animalImageBlock.innerHTML = `<img src="${e.target.result}" alt="Загруженное фото питомца" class="mb-4 max-w-xs mx-auto rounded" />`;
+            // Вместо отображения загруженного фото, показываем предустановленное изображение
+            // в зависимости от выбранного типа животного
+            if (selectedAnimal === 'cat') {
+                // Показываем фото кошки (1.jpg)
+                animalImageBlock.innerHTML = `<img src="1.jpg" alt="Фото кошки" class="mb-4 max-w-xs mx-auto rounded" />`;
                 animalImageBlock.classList.remove('hidden');
-
-                // Показать случайную рекомендацию
-                let recs = selectedAnimal === 'cat' ? catRecommendations : dogRecommendations;
-                let randomIndex = Math.floor(Math.random() * recs.length);
-                recommendations.textContent = recs[randomIndex];
-                recommendations.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
+                catRecommendations.classList.remove('hidden');
+                dogRecommendations.classList.add('hidden');
+            } else if (selectedAnimal === 'dog') {
+                // Показываем фото собаки (2.jpg)
+                animalImageBlock.innerHTML = `<img src="2.jpg" alt="Фото собаки" class="mb-4 max-w-xs mx-auto rounded" />`;
+                animalImageBlock.classList.remove('hidden');
+                dogRecommendations.classList.remove('hidden');
+                catRecommendations.classList.add('hidden');
+            }
         });
     </script>
 
